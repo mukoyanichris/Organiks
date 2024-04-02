@@ -1,0 +1,12 @@
+{
+  "canisters": {
+    "organiks": {
+      "type": "custom",
+      "build": "npx azle organiks",
+      "root": "src",
+      "ts": "src/index.ts",
+      "candid": "src/index.did",
+      "wasm": ".azle/organiks/organiks.wasm.gz"
+    }
+  }
+}

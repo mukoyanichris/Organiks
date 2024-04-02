@@ -1,0 +1,75 @@
+type EggPrice = record {
+  id : text;
+  createdAt : nat64;
+  egg_type : text;
+  updatedAt : opt nat64;
+  price : float64;
+};
+type EggPricePayload = record { egg_type : text; price : float64 };
+type EggRecord = record {
+  id : text;
+  creator : principal;
+  cracked_egg_count : float64;
+  createdAt : nat64;
+  total_egg_count : float64;
+  egg_type : text;
+  updatedAt : opt nat64;
+};
+type EggRecordPayload = record {
+  cracked_egg_count : float64;
+  total_egg_count : float64;
+  egg_type : text;
+};
+type PoultryRecord = record {
+  id : text;
+  weight_kg : float64;
+  creator : principal;
+  record_name : text;
+  createdAt : nat64;
+  age_month : float64;
+  health_status : text;
+  updatedAt : opt nat64;
+  category : text;
+};
+type PoultryRecordPayload = record {
+  weight_kg : float64;
+  record_name : text;
+  age_month : float64;
+  health_status : text;
+  category : text;
+};
+type _AzleResult = variant { Ok : EggPrice; Err : text };
+type _AzleResult_1 = variant { Ok : EggRecord; Err : text };
+type _AzleResult_2 = variant { Ok : PoultryRecord; Err : text };
+type _AzleResult_3 = variant { Ok : vec EggPrice; Err : text };
+type _AzleResult_4 = variant { Ok : vec EggRecord; Err : text };
+type _AzleResult_5 = variant { Ok : vec PoultryRecord; Err : text };
+service : () -> {
+  addEggPrice : (EggPricePayload) -> (_AzleResult);
+  addEggRecord : (EggRecordPayload) -> (_AzleResult_1);
+  addPoultryRecord : (PoultryRecordPayload) -> (_AzleResult_2);
+  deleteEggPrice : (text) -> (_AzleResult);
+  deleteEggRecord : (text) -> (_AzleResult_1);
+  deletePoultryRecord : (text) -> (_AzleResult_2);
+  getEggPrice : (text) -> (_AzleResult) query;
+  getEggPrices : () -> (_AzleResult_3) query;
+  getEggPricesByEggType : (text) -> (_AzleResult_3) query;
+  getEggRecord : (text) -> (_AzleResult_1) query;
+  getEggRecords : () -> (_AzleResult_4) query;
+  getEggRecordsByCreator : (principal) -> (_AzleResult_4) query;
+  getEggRecordsByEggType : (text) -> (_AzleResult_4) query;
+  getInitialEggPrices : () -> (_AzleResult_3) query;
+  getInitialEggRecords : () -> (_AzleResult_4) query;
+  getInitialPoultryRecords : () -> (_AzleResult_5) query;
+  getNextEggPrices : (float64, float64) -> (_AzleResult_3) query;
+  getNextEggRecords : (float64, float64) -> (_AzleResult_4) query;
+  getNextPoultryRecords : (float64, float64) -> (_AzleResult_5) query;
+  getPoultryRecord : (text) -> (_AzleResult_2) query;
+  getPoultryRecords : () -> (_AzleResult_5) query;
+  getPoultryRecordsByCategory : (text) -> (_AzleResult_5) query;
+  getPoultryRecordsByCreator : (principal) -> (_AzleResult_5) query;
+  getPoultryRecordsByHealthStatus : (text) -> (_AzleResult_5) query;
+  updateEggPrice : (text, EggPricePayload) -> (_AzleResult);
+  updateEggRecord : (text, EggRecordPayload) -> (_AzleResult_1);
+  updatePoultryRecord : (text, PoultryRecordPayload) -> (_AzleResult_2);
+}
