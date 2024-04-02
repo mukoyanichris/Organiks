@@ -67,6 +67,24 @@ type EggPricePayload = Record<{
   egg_type: string;
 }>;
 
+// Egg Order
+type EggOrder = Record<{
+  id: string;
+  egg_type: string;
+  customer_name: string;
+  quantity: number;
+  total_price: number;
+  createdAt: nat64;
+  updatedAt: Opt<nat64>;
+}>;
+
+// Egg Order Payload
+type EggOrderPayload = Record<{
+  customer_name: string;
+  egg_type: string;
+  quantity: number;
+}>;
+
 // Poultry Record Storage
 const PoultryRecordStorage = new StableBTreeMap<string, PoultryRecord>(
   0,
@@ -79,6 +97,9 @@ const EggRecordStorage = new StableBTreeMap<string, EggRecord>(1, 44, 512);
 
 // Egg Price Storage
 const EggPriceStorage = new StableBTreeMap<string, EggPrice>(2, 44, 512);
+
+// Egg Order Storage
+const EggOrderStorage = new StableBTreeMap<string, EggOrder>(3, 44, 512);
 
 // Number of Poultry Records to load Initially.
 const initialPoultryRecordLoadSize = 5;
@@ -649,6 +670,65 @@ export function deleteEggPrice(id: string): Result<EggPrice, string> {
         `couldn't find a egg price with id=${id}, record not found`
       ),
   });
+}
+
+// Egg Order
+
+// Place a new egg order
+$update;
+export function placeEggOrder(
+  payload: EggOrderPayload
+): Result<EggOrder, string> {
+  // Validate user input
+  if (!payload.egg_type || !payload.quantity || !payload.customer_name) {
+    return Result.Err<EggOrder, string>("Invalid input");
+  }
+
+  try {
+    const eggPrice = EggPriceStorage.values().find(
+      (price) => price.egg_type === payload.egg_type
+    );
+
+    const eggRecord = EggRecordStorage.values().find(
+      (record) => record.egg_type === payload.egg_type
+    );
+
+    if (!eggPrice || !eggRecord) {
+      return Result.Err<EggOrder, string>(
+        "Egg price or egg record not found"
+      );
+    }
+
+    const total_price = eggPrice.price * payload.quantity;
+
+    if (eggRecord.total_egg_count < payload.quantity) {
+      return Result.Err<EggOrder, string>(
+        "Insufficient eggs to place the order"
+      );
+    }
+
+    // Update the egg record
+    const updatedEggRecord: EggRecord = {
+      ...eggRecord,
+      total_egg_count: eggRecord.total_egg_count - payload.quantity,
+      updatedAt: Opt.Some(ic.time()),
+    };
+
+    EggRecordStorage.insert(updatedEggRecord.id, updatedEggRecord);
+
+    // Create a new egg order
+    const newEggOrder: EggOrder = {
+      id: uuidv4(),
+      createdAt: ic.time(),
+      updatedAt: Opt.None,
+      total_price,
+      ...payload,
+    };
+    EggOrderStorage.insert(newEggOrder.id, newEggOrder);
+    return Result.Ok<EggOrder, string>(newEggOrder);
+  } catch (err) {
+    return Result.Err<EggOrder, string>("Failed to place order");
+  }
 }
 
 // UUID workaround

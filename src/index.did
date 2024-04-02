@@ -1,3 +1,17 @@
+type EggOrder = record {
+  id : text;
+  createdAt : nat64;
+  total_price : float64;
+  egg_type : text;
+  updatedAt : opt nat64;
+  quantity : float64;
+  customer_name : text;
+};
+type EggOrderPayload = record {
+  egg_type : text;
+  quantity : float64;
+  customer_name : text;
+};
 type EggPrice = record {
   id : text;
   createdAt : nat64;
@@ -44,6 +58,7 @@ type _AzleResult_2 = variant { Ok : PoultryRecord; Err : text };
 type _AzleResult_3 = variant { Ok : vec EggPrice; Err : text };
 type _AzleResult_4 = variant { Ok : vec EggRecord; Err : text };
 type _AzleResult_5 = variant { Ok : vec PoultryRecord; Err : text };
+type _AzleResult_6 = variant { Ok : EggOrder; Err : text };
 service : () -> {
   addEggPrice : (EggPricePayload) -> (_AzleResult);
   addEggRecord : (EggRecordPayload) -> (_AzleResult_1);
@@ -69,6 +84,7 @@ service : () -> {
   getPoultryRecordsByCategory : (text) -> (_AzleResult_5) query;
   getPoultryRecordsByCreator : (principal) -> (_AzleResult_5) query;
   getPoultryRecordsByHealthStatus : (text) -> (_AzleResult_5) query;
+  placeEggOrder : (EggOrderPayload) -> (_AzleResult_6);
   updateEggPrice : (text, EggPricePayload) -> (_AzleResult);
   updateEggRecord : (text, EggRecordPayload) -> (_AzleResult_1);
   updatePoultryRecord : (text, PoultryRecordPayload) -> (_AzleResult_2);
